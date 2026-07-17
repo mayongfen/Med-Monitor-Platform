@@ -8,6 +8,8 @@ import {
   Wrench,
   User,
   LogIn,
+  Archive,
+  SlidersHorizontal,
   Users,
   UserCog,
   FolderTree,
@@ -32,6 +34,7 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { title: '电子水牌', href: '/monitor/water', icon: Tv },
       { title: '告警管理', href: '/monitor/alarms', icon: BellRing },
+      { title: '告警规则', href: '/monitor/rules', icon: SlidersHorizontal },
     ],
   },
   {
@@ -53,6 +56,7 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { title: '患者档案', href: '/patients', icon: User },
       { title: '入出院管理', href: '/patients/admission', icon: LogIn },
+      { title: '住院归档', href: '/patients/archive', icon: Archive },
     ],
   },
   {

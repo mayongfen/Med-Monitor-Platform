@@ -16,6 +16,16 @@ export interface Patient {
   history?: string
 }
 
+export type Outcome = 'cured' | 'improved' | 'unchanged' | 'transferred' | 'deceased'
+
+export const OUTCOME_LABEL: Record<Outcome, string> = {
+  cured: '治愈',
+  improved: '好转',
+  unchanged: '未愈',
+  transferred: '转院',
+  deceased: '死亡',
+}
+
 export interface Admission {
   patientId: string
   admissionNo: string
@@ -29,6 +39,8 @@ export interface Admission {
   bedId?: string
   deviceId?: string
   status: AdmissionStatus
+  outcome?: Outcome
+  archivedAt?: string
 }
 
 export const PATIENTS: Patient[] = [
@@ -57,8 +69,8 @@ export const ADMISSIONS: Admission[] = [
   { patientId: 'P008', admissionNo: 'AD-20260713-047', serialNo: 'S-047', inAt: '2026-07-13 15:50', diagnosis: '贫血查因', doctor: '李主任', type: 'transfer', bedId: 'W02-04', deviceId: 'D008', status: 'admitted' },
   { patientId: 'P009', admissionNo: 'AD-20260714-051', serialNo: 'S-051', inAt: '2026-07-14 10:15', diagnosis: '上呼吸道感染', doctor: '陈医生', type: 'outpatient', insurance: '新农合', bedId: 'W03-01', deviceId: 'D009', status: 'admitted' },
   { patientId: 'P010', admissionNo: 'AD-20260715-058', serialNo: 'S-058', inAt: '2026-07-15 13:30', diagnosis: '脑梗康复', doctor: '陈医生', type: 'outpatient', bedId: 'W03-03', deviceId: 'D010', status: 'admitted' },
-  { patientId: 'P011', admissionNo: 'AD-20260620-088', serialNo: 'S-088', inAt: '2026-06-20 09:00', outAt: '2026-06-28 10:30', diagnosis: '社区获得性肺炎', doctor: '张主任', type: 'outpatient', insurance: '城镇职工医保', status: 'discharged' },
-  { patientId: 'P012', admissionNo: 'AD-20260615-072', serialNo: 'S-072', inAt: '2026-06-15 14:20', outAt: '2026-06-25 09:00', diagnosis: '甲亢复查', doctor: '李主任', type: 'outpatient', status: 'discharged' },
+  { patientId: 'P011', admissionNo: 'AD-20260620-088', serialNo: 'S-088', inAt: '2026-06-20 09:00', outAt: '2026-06-28 10:30', diagnosis: '社区获得性肺炎', doctor: '张主任', type: 'outpatient', insurance: '城镇职工医保', status: 'discharged', outcome: 'cured', archivedAt: '2026-06-28 10:35' },
+  { patientId: 'P012', admissionNo: 'AD-20260615-072', serialNo: 'S-072', inAt: '2026-06-15 14:20', outAt: '2026-06-25 09:00', diagnosis: '甲亢复查', doctor: '李主任', type: 'outpatient', status: 'discharged', outcome: 'improved', archivedAt: '2026-06-25 09:10' },
 ]
 
 export const ADMISSION_TYPE_LABEL: Record<AdmissionType, string> = {
@@ -79,4 +91,14 @@ export function patientName(id?: string) {
 
 export function activeAdmissions() {
   return ADMISSIONS.filter((a) => a.status === 'admitted')
+}
+
+export function archivedAdmissions() {
+  return ADMISSIONS.filter((a) => a.status === 'discharged')
+}
+
+export function stayDays(inAt: string, outAt?: string): number {
+  const start = new Date(inAt.replace(' ', 'T')).getTime()
+  const end = outAt ? new Date(outAt.replace(' ', 'T')).getTime() : Date.now()
+  return Math.max(0, Math.round((end - start) / (1000 * 60 * 60 * 24)))
 }
