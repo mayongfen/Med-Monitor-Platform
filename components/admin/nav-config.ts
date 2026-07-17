@@ -1,14 +1,21 @@
 import {
-  Activity,
-  Building2,
-  FolderTree,
-  GitBranch,
   LayoutDashboard,
-  Menu as MenuIcon,
-  ScrollText,
-  ShieldCheck,
-  UserCog,
+  Tv,
+  BellRing,
+  Building2,
+  BedDouble,
+  HardDrive,
+  Wrench,
+  User,
+  LogIn,
   Users,
+  UserCog,
+  FolderTree,
+  Briefcase,
+  Menu as MenuIcon,
+  ShieldCheck,
+  ScrollText,
+  GitBranch,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -17,33 +24,48 @@ export type NavGroup = { label: string; items: NavLink[] }
 
 export const NAV_GROUPS: NavGroup[] = [
   {
-    label: '监控',
-    items: [{ title: '实时监护大屏', href: '/dashboard', icon: Activity }],
+    label: '工作台',
+    items: [{ title: '系统首页', href: '/', icon: LayoutDashboard }],
   },
   {
-    label: '身份与认证',
+    label: '监护管理',
+    items: [
+      { title: '电子水牌', href: '/monitor/water', icon: Tv },
+      { title: '告警管理', href: '/monitor/alarms', icon: BellRing },
+    ],
+  },
+  {
+    label: '病区管理',
+    items: [
+      { title: '病区管理', href: '/ward', icon: Building2 },
+      { title: '床位管理', href: '/ward/beds', icon: BedDouble },
+    ],
+  },
+  {
+    label: '设备管理',
+    items: [
+      { title: '设备库存', href: '/devices', icon: HardDrive },
+      { title: '维护保养', href: '/devices/maintain', icon: Wrench },
+    ],
+  },
+  {
+    label: '患者管理',
+    items: [
+      { title: '患者档案', href: '/patients', icon: User },
+      { title: '入出院管理', href: '/patients/admission', icon: LogIn },
+    ],
+  },
+  {
+    label: '系统管理',
     items: [
       { title: '用户管理', href: '/admin/users', icon: Users },
       { title: '角色管理', href: '/admin/roles', icon: UserCog },
       { title: '部门管理', href: '/admin/depts', icon: FolderTree },
+      { title: '岗位管理', href: '/admin/positions', icon: Briefcase },
       { title: '菜单管理', href: '/admin/menus', icon: MenuIcon },
-    ],
-  },
-  {
-    label: '权限',
-    items: [
       { title: '权限矩阵', href: '/admin/permissions', icon: ShieldCheck },
-      { title: '申请与委托', href: '/admin/approvals', icon: LayoutDashboard },
-    ],
-  },
-  {
-    label: '多租户',
-    items: [{ title: '租户管理', href: '/admin/tenants', icon: Building2 }],
-  },
-  {
-    label: '审计',
-    items: [
-      { title: '日志查询', href: '/admin/audit', icon: ScrollText },
+      { title: '租户管理', href: '/admin/tenants', icon: Building2 },
+      { title: '审计日志', href: '/admin/audit', icon: ScrollText },
       { title: '链路追踪', href: '/admin/trace', icon: GitBranch },
     ],
   },

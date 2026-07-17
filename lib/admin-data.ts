@@ -282,3 +282,31 @@ export const TRACES: Trace[] = [
     ],
   },
 ]
+
+// ── 岗位管理 ──────────────────────────────────────────
+export type PositionStatus = 'open' | 'closed'
+
+export interface Position {
+  id: number
+  name: string
+  code: string
+  order: number
+  status: PositionStatus
+  remark: string
+  createdAt: string
+}
+
+export const POSITIONS: Position[] = [
+  { id: 1, name: '科主任', code: 'DEPT_DIR', order: 1, status: 'open', remark: '科室负责人', createdAt: '2025-01-01' },
+  { id: 2, name: '护士长', code: 'HEAD_NURSE', order: 2, status: 'open', remark: '病区护理管理', createdAt: '2025-01-01' },
+  { id: 3, name: '主治医师', code: 'ATTENDING', order: 3, status: 'open', remark: '临床诊疗', createdAt: '2025-01-01' },
+  { id: 4, name: '住院医师', code: 'RESIDENT', order: 4, status: 'open', remark: '病区值班', createdAt: '2025-01-01' },
+  { id: 5, name: '责任护士', code: 'RN', order: 5, status: 'open', remark: '床位护理', createdAt: '2025-01-01' },
+  { id: 6, name: '设备工程师', code: 'ENG', order: 6, status: 'open', remark: '监护设备维护', createdAt: '2025-01-01' },
+  { id: 7, name: '质控专员', code: 'QC', order: 7, status: 'closed', remark: '质量与合规', createdAt: '2025-03-01' },
+]
+
+export const POSITION_STATUS_LABEL: Record<PositionStatus, string> = {
+  open: '开启',
+  closed: '关闭',
+}
