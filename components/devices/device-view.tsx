@@ -9,11 +9,13 @@ import { exportCSV } from '@/lib/export'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { DeviceActionDialog } from './device-action-dialog'
+import { ImportDialog } from '@/components/ui/import-dialog'
 
 export function DeviceView() {
   const { devices } = useStore()
   const [dialog, setDialog] = useState<{ open: boolean; deviceId: string | null; mode: 'bind' | 'unbind' | 'scrap' }>({ open: false, deviceId: null, mode: 'bind' })
 
+  const [importOpen, setImportOpen] = useState(false)
   const order: DeviceStatus[] = ['in_use', 'standby', 'fault', 'scrapped']
   const counts = devices.reduce((acc, d) => { acc[d.status] = (acc[d.status] ?? 0) + 1; return acc }, {} as Record<DeviceStatus, number>)
   const totalValue = devices.reduce((s, d) => s + depreciation(d).netValue, 0)
@@ -52,6 +54,7 @@ export function DeviceView() {
             <HardDrive className="size-4 text-primary" /> 监护垫设备清单
           </h2>
           <div className="flex gap-2">
+            <Button size="sm" variant="outline" onClick={() => setImportOpen(true)}><Upload className="size-4" /> 导入</Button>
             <Button size="sm" variant="outline" onClick={doExport}><Download className="size-4" /> 导出</Button>
             <Button size="sm"><Plus className="size-4" /> 设备入库</Button>
           </div>
@@ -110,6 +113,7 @@ export function DeviceView() {
       </div>
 
       <DeviceActionDialog open={dialog.open} onOpenChange={(o) => setDialog((s) => ({ ...s, open: o }))} deviceId={dialog.deviceId} mode={dialog.mode} />
+      <ImportDialog open={importOpen} onOpenChange={setImportOpen} title="设备" template={['设备编码','型号','入库时间','保管人','原值']} onImport={(rows) => { rows.forEach(() => {}); return rows.length }} />
     </div>
   )
 }

@@ -8,6 +8,7 @@ import { WARDS, BED_STATUS_LABEL, BED_STATUS_META, BED_TYPE_LABEL, type BedStatu
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { BedActionDialog } from './bed-action-dialog'
+import { BedCardDialog } from '@/components/patients/bed-card-dialog'
 import { useConfirm } from '@/components/ui/form-dialog'
 import { toast } from 'sonner'
 
@@ -17,6 +18,7 @@ export function BedView() {
   const { beds } = useStore()
   const [wardId, setWardId] = useState<string>('all')
   const [dialog, setDialog] = useState<{ open: boolean; bedId: string | null; mode: 'assign' | 'change' | 'unbind' | 'status' }>({ open: false, bedId: null, mode: 'assign' })
+  const [cardBedId, setCardBedId] = useState<string | null>(null)
   const { confirm, dialog: confirmDialog } = useConfirm()
 
   const bedsList = wardId === 'all' ? beds : beds.filter((b) => b.wardId === wardId)
@@ -97,6 +99,7 @@ export function BedView() {
                         )}
                         {b.status === 'occupied' && (
                           <>
+                            <button onClick={() => setCardBedId(b.id)} className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] text-primary hover:bg-primary/20">床头卡</button>
                             <button onClick={() => openDialog(b.id, 'change')} className="rounded bg-muted px-1.5 py-0.5 text-[10px] text-foreground hover:bg-muted/70">换床</button>
                             <button onClick={() => openDialog(b.id, 'unbind')} className="rounded bg-destructive/10 px-1.5 py-0.5 text-[10px] text-destructive hover:bg-destructive/20">解绑</button>
                           </>
@@ -117,6 +120,7 @@ export function BedView() {
       </div>
 
       <BedActionDialog open={dialog.open} onOpenChange={(o) => setDialog((s) => ({ ...s, open: o }))} bedId={dialog.bedId} mode={dialog.mode} />
+      <BedCardDialog open={!!cardBedId} onOpenChange={(o) => !o && setCardBedId(null)} bedId={cardBedId} />
       {confirmDialog}
     </div>
   )
