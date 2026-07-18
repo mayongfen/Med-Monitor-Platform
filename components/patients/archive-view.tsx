@@ -2,23 +2,21 @@
 
 import { useState } from 'react'
 import { Archive, Search, Download } from 'lucide-react'
-import {
-  ADMISSIONS,
-  patientName,
-  OUTCOME_LABEL,
-  stayDays,
-  type Outcome,
-} from '@/lib/patient-data'
+import { useStore } from '@/lib/store'
+import { patientName, OUTCOME_LABEL, stayDays, type Outcome } from '@/lib/patient-data'
 import { wardName } from '@/lib/ward-data'
+import { exportCSV } from '@/lib/export'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 
 export function ArchiveView() {
+  const { admissions } = useStore()
   const [q, setQ] = useState('')
   const [outcome, setOutcome] = useState<Outcome | 'all'>('all')
 
-  const list = ADMISSIONS.filter((a) => a.status === 'discharged').filter((a) => {
+  const all = admissions.filter((a) => a.status === 'discharged')
+  const list = all.filter((a) => {
     if (q) {
       const kw = q.trim().toLowerCase()
       if (!patientName(a.patientId).toLowerCase().includes(kw) && !a.admissionNo.toLowerCase().includes(kw) && !a.diagnosis.toLowerCase().includes(kw)) return false
@@ -34,7 +32,7 @@ export function ArchiveView() {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-        <Stat label="归档总数" value={ADMISSIONS.filter((a) => a.status === 'discharged').length} accent="text-primary" />
+        <Stat label="归档总数" value={all.length} accent="text-primary" />
         <Stat label="当前筛选" value={list.length} accent="text-chart-1" />
         <Stat label="平均住院天数" value={avgDays} accent="text-chart-5" />
       </div>
@@ -44,7 +42,10 @@ export function ArchiveView() {
           <h2 className="flex items-center gap-2 text-sm font-semibold text-foreground">
             <Archive className="size-4 text-primary" /> 住院归档
           </h2>
-          <Button size="sm" variant="outline">
+          <Button size="sm" variant="outline" onClick={() => {
+            const rows = list.map((a) => [a.admissionNo, patientName(a.patientId), a.inAt, a.outAt ?? '', String(stayDays(a.inAt, a.outAt)), a.diagnosis, a.doctor, a.outcome ? OUTCOME_LABEL[a.outcome] : '', a.archivedAt ?? ''])
+            exportCSV(['住院号','患者','入院','出院','天数','诊断','医生','转归','归档时间'], rows, '住院归档')
+          }}>
             <Download className="size-4" /> 导出归档
           </Button>
         </div>

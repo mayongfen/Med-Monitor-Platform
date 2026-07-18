@@ -2,17 +2,21 @@
 
 import { useState } from 'react'
 import { Plus, Download, Search, User } from 'lucide-react'
-import { PATIENTS } from '@/lib/patient-data'
+import { useStore } from '@/lib/store'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { exportCSV } from '@/lib/export'
 import { cn } from '@/lib/utils'
+import { PatientDialog } from './patient-dialog'
 
 export function PatientView() {
+  const { patients } = useStore()
   const [q, setQ] = useState('')
   const [hasAllergy, setHasAllergy] = useState(false)
+  const [dialogOpen, setDialogOpen] = useState(false)
 
-  const list = PATIENTS.filter((p) => {
+  const list = patients.filter((p) => {
     if (q) {
       const kw = q.trim().toLowerCase()
       if (!p.name.toLowerCase().includes(kw) && !p.id.toLowerCase().includes(kw) && !p.idCard.includes(kw)) return false
@@ -28,10 +32,13 @@ export function PatientView() {
           <User className="size-4 text-primary" /> 住院档案
         </h2>
         <div className="flex gap-2">
-          <Button size="sm" variant="outline">
+          <Button size="sm" variant="outline" onClick={() => {
+            const rows = patients.map((p) => [p.id, p.name, p.gender, p.age, p.idCard, p.contact, p.phone, p.allergy ?? '', p.history ?? ''])
+            exportCSV(['患者ID','姓名','性别','年龄','身份证','联系人','电话','过敏史','病史'], rows, '住院档案')
+          }}>
             <Download className="size-4" /> 导出
           </Button>
-          <Button size="sm">
+          <Button size="sm" onClick={() => setDialogOpen(true)}>
             <Plus className="size-4" /> 新增档案
           </Button>
         </div>
@@ -114,6 +121,8 @@ export function PatientView() {
       <p className="mt-3 text-xs text-muted-foreground">
         支持姓名拼音首字母查询；身份证号支持 OCR 识别录入，年龄由身份证自动计算。
       </p>
+
+      <PatientDialog open={dialogOpen} onOpenChange={setDialogOpen} />
     </div>
   )
 }

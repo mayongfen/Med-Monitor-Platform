@@ -2,29 +2,44 @@
 
 import { useState } from 'react'
 import { Plus, LogIn } from 'lucide-react'
-import {
-  ADMISSIONS,
-  ADMISSION_TYPE_LABEL,
-  ADMISSION_STATUS_LABEL,
-  type AdmissionStatus,
-} from '@/lib/patient-data'
+import { useStore } from '@/lib/store'
 import { patientName } from '@/lib/patient-data'
 import { wardName } from '@/lib/ward-data'
+import { ADMISSION_TYPE_LABEL, ADMISSION_STATUS_LABEL, stayDays, type AdmissionStatus } from '@/lib/patient-data'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { AdmitDialog } from './admit-dialog'
+import { DischargeDialog } from './discharge-dialog'
+import { useConfirm } from '@/components/ui/form-dialog'
+import { toast } from 'sonner'
 
 export function AdmissionView() {
+  const { admissions } = useStore()
   const [tab, setTab] = useState<AdmissionStatus | 'all'>('all')
-  const list = ADMISSIONS.filter((a) => (tab === 'all' ? true : a.status === tab))
+  const [admitOpen, setAdmitOpen] = useState(false)
+  const [dischargeNo, setDischargeNo] = useState<string | null>(null)
+  const { confirm, dialog } = useConfirm()
+
+  const list = admissions.filter((a) => (tab === 'all' ? true : a.status === tab))
+
+  async function handleDischarge(admissionNo: string) {
+    const ok = await confirm({
+      title: '确认办理出院？',
+      description: '出院后将自动解绑监护设备、床位转为"待消毒"、患者记录转为历史档案。',
+      variant: 'destructive',
+      confirmText: '确认出院',
+    })
+    if (ok) setDischargeNo(admissionNo)
+  }
 
   return (
     <div className="rounded-xl border border-border bg-card p-4">
       <div className="mb-3 flex items-center justify-between">
         <h2 className="flex items-center gap-2 text-sm font-semibold text-foreground">
-          <LogIn className="size-4 text-primary" /> 入出院管理
+          <LogIn className="size-4 text-primary" /> 住院办理
         </h2>
-        <Button size="sm">
+        <Button size="sm" onClick={() => setAdmitOpen(true)}>
           <Plus className="size-4" /> 办理入院
         </Button>
       </div>
@@ -39,7 +54,7 @@ export function AdmissionView() {
               tab === t ? 'bg-primary text-primary-foreground' : 'text-muted-foreground',
             )}
           >
-            {t === 'all' ? '全部' : ADMISSION_STATUS_LABEL[t]}
+            {t === 'all' ? `全部 ${admissions.length}` : `${ADMISSION_STATUS_LABEL[t]} ${admissions.filter((a) => a.status === t).length}`}
           </button>
         ))}
       </div>
@@ -52,11 +67,11 @@ export function AdmissionView() {
               <th className="px-3 py-2 font-medium">患者</th>
               <th className="px-3 py-2 font-medium">入院时间</th>
               <th className="px-3 py-2 font-medium">出院时间</th>
+              <th className="px-3 py-2 font-medium">天数</th>
               <th className="px-3 py-2 font-medium">诊断</th>
               <th className="px-3 py-2 font-medium">医生</th>
               <th className="px-3 py-2 font-medium">类型</th>
-              <th className="px-3 py-2 font-medium">医保</th>
-              <th className="px-3 py-2 font-medium">床位</th>
+              <th className="px-3 py-2 font-medium">床位/设备</th>
               <th className="px-3 py-2 font-medium">状态</th>
               <th className="px-3 py-2 font-medium">操作</th>
             </tr>
@@ -68,14 +83,15 @@ export function AdmissionView() {
                 <td className="whitespace-nowrap px-3 py-2.5 font-medium text-foreground">{patientName(a.patientId)}</td>
                 <td className="px-3 py-2.5 text-muted-foreground">{a.inAt}</td>
                 <td className="px-3 py-2.5 text-muted-foreground">{a.outAt ?? '—'}</td>
+                <td className="px-3 py-2.5 text-muted-foreground">{stayDays(a.inAt, a.outAt)}天</td>
                 <td className="px-3 py-2.5 text-foreground">{a.diagnosis}</td>
                 <td className="px-3 py-2.5 text-muted-foreground">{a.doctor}</td>
                 <td className="px-3 py-2.5">
                   <Badge variant="secondary" className="text-[10px]">{ADMISSION_TYPE_LABEL[a.type]}</Badge>
                 </td>
-                <td className="px-3 py-2.5 text-muted-foreground">{a.insurance ?? '—'}</td>
-                <td className="px-3 py-2.5 text-muted-foreground">
-                  {a.bedId ? `${wardName(a.bedId.split('-')[0])} · ${a.bedId.split('-').slice(-1)[0]}床` : '—'}
+                <td className="px-3 py-2.5 text-xs text-muted-foreground">
+                  {a.bedId ? `${wardName(a.bedId.split('-')[0])}·${a.bedId.split('-').slice(-1)[0]}床` : '—'}
+                  {a.deviceId && <span className="ml-1 font-mono">{a.deviceId}</span>}
                 </td>
                 <td className="px-3 py-2.5">
                   <span
@@ -88,13 +104,18 @@ export function AdmissionView() {
                   </span>
                 </td>
                 <td className="px-3 py-2.5">
-                  <div className="flex gap-2 text-xs">
-                    {a.status === 'admitted' ? (
-                      <button className="text-destructive hover:underline">办理出院</button>
-                    ) : (
-                      <span className="text-muted-foreground/60">已归档</span>
-                    )}
-                  </div>
+                  {a.status === 'admitted' ? (
+                    <button onClick={() => handleDischarge(a.admissionNo)} className="text-xs text-destructive hover:underline">
+                      办理出院
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => toast.info('已归档，可在「住院归档」查看')}
+                      className="text-xs text-primary hover:underline"
+                    >
+                      查看归档
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}
@@ -102,8 +123,12 @@ export function AdmissionView() {
         </table>
       </div>
       <p className="mt-3 text-xs text-muted-foreground">
-        入院规则：同一时间同一患者不能重复入院；床位分配时校验床位"空闲"状态并自动更新为"占用"；30 天内再次入院自动预警标记。
+        入院自动校验床位空闲并占用；出院联动解绑设备、床位转"待消毒"、记录归档；30 天内重复入院自动预警。
       </p>
+
+      <AdmitDialog open={admitOpen} onOpenChange={setAdmitOpen} />
+      <DischargeDialog open={!!dischargeNo} onOpenChange={(o) => !o && setDischargeNo(null)} admissionNo={dischargeNo} />
+      {dialog}
     </div>
   )
 }
