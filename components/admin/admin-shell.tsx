@@ -6,7 +6,6 @@ import { AdminSidebar } from './admin-sidebar'
 import { AdminTopbar } from './admin-topbar'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import { AlarmBanner } from '@/components/monitor/alarm-banner'
 
 export function AdminShell({
   title,
@@ -30,7 +29,6 @@ export function AdminShell({
 
       <div className="flex min-w-0 flex-1 flex-col">
         <AdminTopbar title={title} onOpenMobile={() => setMobileOpen(true)} />
-        <AlarmBanner />
         <main className="flex-1 overflow-y-auto p-4 md:p-6">
           {(description || actions) && (
             <div className="mb-4 flex flex-wrap items-start justify-between gap-3 md:mb-6">

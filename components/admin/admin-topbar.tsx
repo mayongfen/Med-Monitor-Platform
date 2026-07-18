@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Building2, Check, ChevronsUpDown, LogOut, Moon, Shield, Sun, User } from 'lucide-react'
+import { AlarmBanner } from '@/components/monitor/alarm-banner'
 import { TENANTS, EDITION_LABEL, type Role } from '@/lib/admin-data'
 import { useAuth, ROLE_OPTIONS } from '@/lib/auth'
 import {
@@ -40,12 +41,14 @@ export function AdminTopbar({ title, onOpenMobile }: { title: string; onOpenMobi
 
   return (
     <header className="flex h-14 shrink-0 items-center justify-between gap-2 border-b border-border bg-card px-3 md:px-5">
-      <div className="flex items-center gap-2 md:gap-3">
+      <div className="flex min-w-0 flex-1 items-center gap-2 md:gap-3">
         {/* 移动端汉堡 */}
         <Button variant="ghost" size="icon" className="md:hidden" onClick={onOpenMobile}>
           <Building2 className="size-5" />
         </Button>
-        <h1 className="text-base font-semibold text-foreground">{title}</h1>
+        <h1 className="shrink-0 text-base font-semibold text-foreground">{title}</h1>
+        {/* 告警滚动条（与主题按钮同层级） */}
+        <AlarmBanner />
       </div>
 
       <div className="flex items-center gap-1.5 md:gap-2">

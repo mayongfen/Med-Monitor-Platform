@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
-import { RULE_TYPE_LABEL, type AlarmRule, type AlarmOperator, type RuleType } from '@/lib/alarm-rule-data'
+import { RULE_TYPE_LABEL, OP_LABEL, type AlarmRule, type AlarmOperator, type RuleType } from '@/lib/alarm-rule-data'
 
 export function RuleDialog({
   open,
@@ -74,7 +74,7 @@ export function RuleDialog({
         <div className="flex flex-col gap-2">
           <Label>类型</Label>
           <Select value={type} onValueChange={(v) => setType(v as RuleType)}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectTrigger><span className="flex-1 text-left">{RULE_TYPE_LABEL[type]}</span></SelectTrigger>
             <SelectContent>
               {(Object.keys(RULE_TYPE_LABEL) as RuleType[]).map((t) => (
                 <SelectItem key={t} value={t}>{RULE_TYPE_LABEL[t]}</SelectItem>
@@ -85,7 +85,7 @@ export function RuleDialog({
         <div className="flex flex-col gap-2">
           <Label>操作符</Label>
           <Select value={op} onValueChange={(v) => setOp(v as AlarmOperator)}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectTrigger><span className="flex-1 text-left">{OP_LABEL[op]}</span></SelectTrigger>
             <SelectContent>
               <SelectItem value="lt">&lt; 小于</SelectItem>
               <SelectItem value="gt">&gt; 大于</SelectItem>
@@ -105,7 +105,7 @@ export function RuleDialog({
         <div className="flex flex-col gap-2">
           <Label>级别</Label>
           <Select value={level} onValueChange={(v) => setLevel(v as 'warning' | 'critical')}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectTrigger><span className="flex-1 text-left">{level === 'warning' ? '预警' : '危急'}</span></SelectTrigger>
             <SelectContent>
               <SelectItem value="warning">预警</SelectItem>
               <SelectItem value="critical">危急</SelectItem>
