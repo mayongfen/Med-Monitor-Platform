@@ -25,14 +25,14 @@ export function PatientView() {
     <div className="rounded-xl border border-border bg-card p-4">
       <div className="mb-3 flex items-center justify-between">
         <h2 className="flex items-center gap-2 text-sm font-semibold text-foreground">
-          <User className="size-4 text-primary" /> 患者档案
+          <User className="size-4 text-primary" /> 住院档案
         </h2>
         <div className="flex gap-2">
           <Button size="sm" variant="outline">
             <Download className="size-4" /> 导出
           </Button>
           <Button size="sm">
-            <Plus className="size-4" /> 新增患者
+            <Plus className="size-4" /> 新增档案
           </Button>
         </div>
       </div>

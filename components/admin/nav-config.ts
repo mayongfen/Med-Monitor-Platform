@@ -52,10 +52,10 @@ export const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    label: '患者管理',
+    label: '住院管理',
     items: [
-      { title: '患者档案', href: '/patients', icon: User },
-      { title: '入出院管理', href: '/patients/admission', icon: LogIn },
+      { title: '住院档案', href: '/patients', icon: User },
+      { title: '住院办理', href: '/patients/admission', icon: LogIn },
       { title: '住院归档', href: '/patients/archive', icon: Archive },
     ],
   },
