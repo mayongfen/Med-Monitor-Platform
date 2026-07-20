@@ -27,7 +27,13 @@ export function useConfirm() {
   }
 
   const dialog = state && (
-    <Dialog open onOpenChange={(o) => { if (!o) { state.resolve(false); setState(null) } }}>
+    <Dialog
+      open
+      // 确认弹窗同样禁用外部点击关闭，避免误触确认 destructive 操作；
+      // 用户必须显式点「取消」或「确认」。
+      disablePointerDismissal
+      onOpenChange={(o) => { if (!o) { state.resolve(false); setState(null) } }}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{state.opts.title || '确认操作'}</DialogTitle>
@@ -58,6 +64,13 @@ export function FormDialog({
   description,
   children,
   footer,
+  /**
+   * 是否允许点击弹窗外部（遮罩）关闭。默认 `false`。
+   *
+   * 表单弹窗默认禁用外部点击关闭，避免用户误触遮罩导致已填内容被清空。
+   * 仅在无表单状态、纯展示类弹窗需要「点外部关闭」时显式传 `dismissible`。
+   */
+  dismissible = false,
 }: {
   open: boolean
   onOpenChange: (o: boolean) => void
@@ -65,9 +78,14 @@ export function FormDialog({
   description?: string
   children: ReactNode
   footer?: ReactNode
+  dismissible?: boolean
 }) {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={onOpenChange}
+      disablePointerDismissal={!dismissible}
+    >
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { exportCSV } from '@/lib/export'
 import { cn } from '@/lib/utils'
+import { CONTACT_RELATION_LABEL, formatContacts, primaryContact, type Patient } from '@/lib/patient-data'
 import { PatientDialog } from './patient-dialog'
 
 export function PatientView() {
@@ -33,8 +34,8 @@ export function PatientView() {
         </h2>
         <div className="flex gap-2">
           <Button size="sm" variant="outline" onClick={() => {
-            const rows = patients.map((p) => [p.id, p.name, p.gender, p.age, p.idCard, p.contact, p.phone, p.allergy ?? '', p.history ?? ''])
-            exportCSV(['患者ID','姓名','性别','年龄','身份证','联系人','电话','过敏史','病史'], rows, '住院档案')
+            const rows = patients.map((p) => [p.id, p.name, p.gender, p.age, p.idCard, p.contacts.length, formatContacts(p), p.allergy ?? '', p.history ?? ''])
+            exportCSV(['患者ID','姓名','性别','年龄','身份证','联系人数','联系人明细','过敏史','病史'], rows, '住院档案')
           }}>
             <Download className="size-4" /> 导出
           </Button>
@@ -75,7 +76,6 @@ export function PatientView() {
               <th className="px-3 py-2 font-medium">年龄</th>
               <th className="px-3 py-2 font-medium">身份证号</th>
               <th className="px-3 py-2 font-medium">紧急联系人</th>
-              <th className="px-3 py-2 font-medium">电话</th>
               <th className="px-3 py-2 font-medium">过敏史</th>
               <th className="px-3 py-2 font-medium">病史</th>
               <th className="px-3 py-2 font-medium">操作</th>
@@ -89,8 +89,9 @@ export function PatientView() {
                 <td className="px-3 py-2.5 text-muted-foreground">{p.gender}</td>
                 <td className="px-3 py-2.5 text-muted-foreground">{p.age}</td>
                 <td className="px-3 py-2.5 font-mono text-xs text-muted-foreground">{p.idCard}</td>
-                <td className="px-3 py-2.5 text-muted-foreground">{p.contact}</td>
-                <td className="px-3 py-2.5 font-mono text-xs text-muted-foreground">{p.phone}</td>
+                <td className="px-3 py-2.5 text-muted-foreground">
+                  <ContactCell patient={p} />
+                </td>
                 <td className="px-3 py-2.5">
                   {p.allergy ? (
                     <Badge variant="secondary" className="text-[10px] bg-destructive/10 text-destructive">{p.allergy}</Badge>
@@ -110,7 +111,7 @@ export function PatientView() {
             ))}
             {list.length === 0 && (
               <tr>
-                <td colSpan={10} className="px-3 py-8 text-center text-sm text-muted-foreground">
+                <td colSpan={9} className="px-3 py-8 text-center text-sm text-muted-foreground">
                   未找到匹配的患者
                 </td>
               </tr>
@@ -123,6 +124,25 @@ export function PatientView() {
       </p>
 
       <PatientDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+    </div>
+  )
+}
+
+function ContactCell({ patient }: { patient: Patient }) {
+  const c = primaryContact(patient)
+  if (!c) return <span className="text-muted-foreground/50">—</span>
+  const extra = patient.contacts.length - 1
+  const rel = c.relation ? CONTACT_RELATION_LABEL[c.relation] : ''
+  return (
+    <div className="flex flex-col gap-0.5">
+      <span className="whitespace-nowrap">
+        {c.name}
+        {rel && <span className="ml-1 text-xs text-muted-foreground">（{rel}）</span>}
+      </span>
+      <span className="flex items-center gap-1 font-mono text-xs text-muted-foreground">
+        {c.phone}
+        {extra > 0 && <Badge variant="secondary" className="text-[10px]">+{extra}</Badge>}
+      </span>
     </div>
   )
 }

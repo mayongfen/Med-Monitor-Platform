@@ -10,6 +10,7 @@ import {
   LogIn,
   Archive,
   SlidersHorizontal,
+  ClipboardList,
   Users,
   UserCog,
   FolderTree,
@@ -35,6 +36,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { title: '电子水牌', href: '/monitor/water', icon: Tv },
       { title: '告警管理', href: '/monitor/alarms', icon: BellRing },
       { title: '告警规则', href: '/monitor/rules', icon: SlidersHorizontal },
+      { title: '监护任务', href: '/monitor/tasks', icon: ClipboardList },
     ],
   },
   {

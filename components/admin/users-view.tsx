@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { KeyRound, Plus, Search, ShieldCheck, ShieldOff } from 'lucide-react'
 import { USERS, ROLES, deptName, tenantName, type User } from '@/lib/admin-data'
+import { wardName } from '@/lib/ward-data'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -67,6 +68,7 @@ export function UsersView() {
               <TableHead>用户</TableHead>
               <TableHead>部门</TableHead>
               <TableHead>角色</TableHead>
+              <TableHead>负责病区</TableHead>
               <TableHead>租户</TableHead>
               <TableHead>2FA</TableHead>
               <TableHead>会话</TableHead>
@@ -100,6 +102,9 @@ export function UsersView() {
                       </Badge>
                     ))}
                   </div>
+                </TableCell>
+                <TableCell className="text-xs text-muted-foreground">
+                  {u.wardIds.length > 0 ? u.wardIds.map(wardName).join(' / ') : '全部病区'}
                 </TableCell>
                 <TableCell className="text-sm text-muted-foreground">{tenantName(u.tenantId)}</TableCell>
                 <TableCell>
@@ -145,7 +150,7 @@ export function UsersView() {
 function NewUserDialog() {
   const [open, setOpen] = useState(false)
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={setOpen} disablePointerDismissal>
       <DialogTrigger render={<Button size="sm"><Plus className="size-4" /> 新增用户</Button>} />
       <DialogContent>
         <DialogHeader>

@@ -5,10 +5,10 @@ import { useStore } from '@/lib/store'
 import { FormDialog } from '@/components/ui/form-dialog'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { DictSelect, dictOptions } from '@/components/ui/dict-select'
 import { Input } from '@/components/ui/input'
+import { OUTCOME_LABEL, type Outcome } from '@/lib/patient-data'
 import { toast } from 'sonner'
-import type { Outcome } from '@/lib/patient-data'
 
 export function DischargeDialog({
   open,
@@ -62,16 +62,11 @@ export function DischargeDialog({
         </div>
         <div className="flex flex-col gap-2">
           <Label>转归</Label>
-          <Select value={outcome} onValueChange={(v) => setOutcome(v as Outcome)}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="cured">治愈</SelectItem>
-              <SelectItem value="improved">好转</SelectItem>
-              <SelectItem value="unchanged">未愈</SelectItem>
-              <SelectItem value="transferred">转院</SelectItem>
-              <SelectItem value="deceased">死亡</SelectItem>
-            </SelectContent>
-          </Select>
+          <DictSelect
+            value={outcome}
+            onValueChange={(v) => setOutcome(v as Outcome)}
+            options={dictOptions(OUTCOME_LABEL)}
+          />
         </div>
       </div>
     </FormDialog>

@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 
 function beep(level: 'warning' | 'critical') {
   try {
-    const Ctx = window.AudioContext || (window as any).webkitAudioContext
+    const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
     const ctx = new Ctx()
     const osc = ctx.createOscillator()
     const gain = ctx.createGain()

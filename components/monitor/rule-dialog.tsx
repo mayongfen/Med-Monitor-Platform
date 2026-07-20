@@ -6,9 +6,11 @@ import { FormDialog } from '@/components/ui/form-dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { DictSelect, dictOptions } from '@/components/ui/dict-select'
 import { toast } from 'sonner'
-import { RULE_TYPE_LABEL, OP_LABEL, type AlarmRule, type AlarmOperator, type RuleType } from '@/lib/alarm-rule-data'
+import { RULE_TYPE_LABEL, type AlarmRule, type AlarmOperator, type RuleType } from '@/lib/alarm-rule-data'
+import { ROLE_CODE_LABEL, type RoleCode } from '@/lib/admin-data'
+import { cn } from '@/lib/utils'
 
 export function RuleDialog({
   open,
@@ -29,13 +31,16 @@ export function RuleDialog({
   const [unit, setUnit] = useState('bpm')
   const [level, setLevel] = useState<'warning' | 'critical'>('warning')
   const [remark, setRemark] = useState('')
+  const [notifyRoles, setNotifyRoles] = useState<RoleCode[]>([])
 
   useEffect(() => {
     if (rule) {
       setName(rule.name); setType(rule.type); setOp(rule.op)
       setValue(String(rule.value)); setUnit(rule.unit); setLevel(rule.level); setRemark(rule.remark)
+      setNotifyRoles(rule.notifyRoles ?? [])
     } else {
       setName(''); setType('heart'); setOp('gt'); setValue(''); setUnit('bpm'); setLevel('warning'); setRemark('')
+      setNotifyRoles([])
     }
   }, [rule, open])
 
@@ -46,6 +51,7 @@ export function RuleDialog({
     const r: AlarmRule = {
       id, name: name.trim(), type, metric: RULE_TYPE_LABEL[type],
       op, value: Number(value), unit, level, enabled: true,
+      notifyRoles: notifyRoles.length ? notifyRoles : undefined,
       remark: remark.trim() || '—', updatedAt: new Date().toISOString().slice(0, 10),
     }
     upsertRule(r)
@@ -73,26 +79,24 @@ export function RuleDialog({
       <div className="grid grid-cols-2 gap-3">
         <div className="flex flex-col gap-2">
           <Label>类型</Label>
-          <Select value={type} onValueChange={(v) => setType(v as RuleType)}>
-            <SelectTrigger><span className="flex-1 text-left">{RULE_TYPE_LABEL[type]}</span></SelectTrigger>
-            <SelectContent>
-              {(Object.keys(RULE_TYPE_LABEL) as RuleType[]).map((t) => (
-                <SelectItem key={t} value={t}>{RULE_TYPE_LABEL[t]}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <DictSelect
+            value={type}
+            onValueChange={(v) => setType(v as RuleType)}
+            options={dictOptions(RULE_TYPE_LABEL)}
+          />
         </div>
         <div className="flex flex-col gap-2">
           <Label>操作符</Label>
-          <Select value={op} onValueChange={(v) => setOp(v as AlarmOperator)}>
-            <SelectTrigger><span className="flex-1 text-left">{OP_LABEL[op]}</span></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="lt">&lt; 小于</SelectItem>
-              <SelectItem value="gt">&gt; 大于</SelectItem>
-              <SelectItem value="lte">≤ 小于等于</SelectItem>
-              <SelectItem value="gte">≥ 大于等于</SelectItem>
-            </SelectContent>
-          </Select>
+          <DictSelect
+            value={op}
+            onValueChange={(v) => setOp(v as AlarmOperator)}
+            options={[
+              { value: 'lt', label: '< 小于' },
+              { value: 'gt', label: '> 大于' },
+              { value: 'lte', label: '≤ 小于等于' },
+              { value: 'gte', label: '≥ 大于等于' },
+            ]}
+          />
         </div>
         <div className="flex flex-col gap-2">
           <Label htmlFor="rval">阈值</Label>
@@ -104,18 +108,41 @@ export function RuleDialog({
         </div>
         <div className="flex flex-col gap-2">
           <Label>级别</Label>
-          <Select value={level} onValueChange={(v) => setLevel(v as 'warning' | 'critical')}>
-            <SelectTrigger><span className="flex-1 text-left">{level === 'warning' ? '预警' : '危急'}</span></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="warning">预警</SelectItem>
-              <SelectItem value="critical">危急</SelectItem>
-            </SelectContent>
-          </Select>
+          <DictSelect
+            value={level}
+            onValueChange={(v) => setLevel(v as 'warning' | 'critical')}
+            options={[
+              { value: 'warning', label: '预警' },
+              { value: 'critical', label: '危急' },
+            ]}
+          />
         </div>
         <div className="flex flex-col gap-2">
           <Label htmlFor="rremark">备注</Label>
           <Input id="rremark" value={remark} onChange={(e) => setRemark(e.target.value)} />
         </div>
+      </div>
+      <div className="flex flex-col gap-2">
+        <Label>通知角色（不选 = 所有可见角色）</Label>
+        <div className="flex flex-wrap gap-2">
+          {(Object.keys(ROLE_CODE_LABEL) as RoleCode[]).map((rc) => {
+            const on = notifyRoles.includes(rc)
+            return (
+              <button
+                key={rc}
+                type="button"
+                onClick={() => setNotifyRoles((prev) => (on ? prev.filter((x) => x !== rc) : [...prev, rc]))}
+                className={cn(
+                  'rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors',
+                  on ? 'border-primary bg-primary/5 text-primary' : 'border-border text-muted-foreground hover:bg-muted',
+                )}
+              >
+                {ROLE_CODE_LABEL[rc]}
+              </button>
+            )
+          })}
+        </div>
+        <p className="text-xs text-muted-foreground">非全局角色仅接收所选角色的告警；全局视角（超管 / 租户管理员 / 审计）始终可见全部告警。</p>
       </div>
     </FormDialog>
   )

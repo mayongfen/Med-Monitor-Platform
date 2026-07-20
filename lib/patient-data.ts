@@ -4,14 +4,31 @@ export type Gender = '男' | '女'
 export type AdmissionType = 'emergency' | 'outpatient' | 'transfer'
 export type AdmissionStatus = 'admitted' | 'discharged'
 
+export type ContactRelation = 'spouse' | 'father' | 'mother' | 'child' | 'sibling' | 'friend' | 'other'
+
+export const CONTACT_RELATION_LABEL: Record<ContactRelation, string> = {
+  spouse: '配偶',
+  father: '父亲',
+  mother: '母亲',
+  child: '子女',
+  sibling: '兄弟姐妹',
+  friend: '朋友',
+  other: '其他',
+}
+
+export interface Contact {
+  name: string
+  phone: string
+  relation?: ContactRelation
+}
+
 export interface Patient {
   id: string
   name: string
   gender: Gender
   age: number
   idCard: string
-  contact: string
-  phone: string
+  contacts: Contact[]
   allergy?: string
   history?: string
 }
@@ -44,18 +61,18 @@ export interface Admission {
 }
 
 export const PATIENTS: Patient[] = [
-  { id: 'P001', name: '张伟', gender: '男', age: 58, idCard: '3101**********0011', contact: '张明', phone: '138****1102', allergy: '青霉素', history: '高血压 5 年' },
-  { id: 'P002', name: '李秀英', gender: '女', age: 67, idCard: '3101**********0028', contact: '李军', phone: '139****3344', history: '糖尿病 2 型' },
-  { id: 'P003', name: '王强', gender: '男', age: 45, idCard: '3101**********0035', contact: '王丽', phone: '137****5566', history: '冠心病' },
-  { id: 'P004', name: '刘敏', gender: '女', age: 39, idCard: '3101**********0042', contact: '刘洋', phone: '136****7788', allergy: '磺胺类' },
-  { id: 'P005', name: '陈杰', gender: '男', age: 72, idCard: '3101**********0059', contact: '陈静', phone: '135****9900', history: '慢阻肺' },
-  { id: 'P006', name: '赵丽', gender: '女', age: 54, idCard: '3101**********0066', contact: '赵磊', phone: '134****1122' },
-  { id: 'P007', name: '孙浩', gender: '男', age: 61, idCard: '3101**********0073', contact: '孙倩', phone: '133****3344', history: '房颤' },
-  { id: 'P008', name: '周芳', gender: '女', age: 48, idCard: '3101**********0080', contact: '周强', phone: '132****5566' },
-  { id: 'P009', name: '吴敏', gender: '女', age: 33, idCard: '3101**********0097', contact: '吴刚', phone: '131****7788' },
-  { id: 'P010', name: '郑国', gender: '男', age: 70, idCard: '3101**********0103', contact: '郑华', phone: '130****9900', history: '脑梗后遗症' },
-  { id: 'P011', name: '冯雷', gender: '男', age: 50, idCard: '3101**********0110', contact: '冯雪', phone: '138****0011', history: '肺炎' },
-  { id: 'P012', name: '韩梅', gender: '女', age: 44, idCard: '3101**********0128', contact: '韩峰', phone: '139****2233' },
+  { id: 'P001', name: '张伟', gender: '男', age: 58, idCard: '3101**********0011', contacts: [{ name: '张明', phone: '138****1102', relation: 'child' }, { name: '李华', phone: '137****0001', relation: 'spouse' }], allergy: '青霉素', history: '高血压 5 年' },
+  { id: 'P002', name: '李秀英', gender: '女', age: 67, idCard: '3101**********0028', contacts: [{ name: '李军', phone: '139****3344', relation: 'child' }], history: '糖尿病 2 型' },
+  { id: 'P003', name: '王强', gender: '男', age: 45, idCard: '3101**********0035', contacts: [{ name: '王丽', phone: '137****5566', relation: 'spouse' }], history: '冠心病' },
+  { id: 'P004', name: '刘敏', gender: '女', age: 39, idCard: '3101**********0042', contacts: [{ name: '刘洋', phone: '136****7788', relation: 'sibling' }], allergy: '磺胺类' },
+  { id: 'P005', name: '陈杰', gender: '男', age: 72, idCard: '3101**********0059', contacts: [{ name: '陈静', phone: '135****9900', relation: 'child' }, { name: '周梅', phone: '138****0005', relation: 'spouse' }], history: '慢阻肺' },
+  { id: 'P006', name: '赵丽', gender: '女', age: 54, idCard: '3101**********0066', contacts: [{ name: '赵磊', phone: '134****1122', relation: 'sibling' }] },
+  { id: 'P007', name: '孙浩', gender: '男', age: 61, idCard: '3101**********0073', contacts: [{ name: '孙倩', phone: '133****3344', relation: 'child' }], history: '房颤' },
+  { id: 'P008', name: '周芳', gender: '女', age: 48, idCard: '3101**********0080', contacts: [{ name: '周强', phone: '132****5566', relation: 'spouse' }] },
+  { id: 'P009', name: '吴敏', gender: '女', age: 33, idCard: '3101**********0097', contacts: [{ name: '吴刚', phone: '131****7788', relation: 'friend' }] },
+  { id: 'P010', name: '郑国', gender: '男', age: 70, idCard: '3101**********0103', contacts: [{ name: '郑华', phone: '130****9900', relation: 'child' }, { name: '孙兰', phone: '130****0010', relation: 'mother' }], history: '脑梗后遗症' },
+  { id: 'P011', name: '冯雷', gender: '男', age: 50, idCard: '3101**********0110', contacts: [{ name: '冯雪', phone: '138****0011', relation: 'spouse' }], history: '肺炎' },
+  { id: 'P012', name: '韩梅', gender: '女', age: 44, idCard: '3101**********0128', contacts: [{ name: '韩峰', phone: '139****2233', relation: 'sibling' }] },
 ]
 
 export const ADMISSIONS: Admission[] = [
@@ -87,6 +104,22 @@ export const ADMISSION_STATUS_LABEL: Record<AdmissionStatus, string> = {
 export function patientName(id?: string) {
   if (!id) return '—'
   return PATIENTS.find((p) => p.id === id)?.name ?? id
+}
+
+// 首要联系人（列表/床头卡默认展示）
+export function primaryContact(p?: Patient): Contact | undefined {
+  return p?.contacts?.[0]
+}
+
+// 联系人格式化为单行字符串，用于导出与紧凑展示
+export function formatContacts(p?: Patient): string {
+  if (!p?.contacts?.length) return '—'
+  return p.contacts
+    .map((c) => {
+      const rel = c.relation ? `(${CONTACT_RELATION_LABEL[c.relation]})` : ''
+      return `${c.name}${rel} ${c.phone}`
+    })
+    .join('；')
 }
 
 export function activeAdmissions() {

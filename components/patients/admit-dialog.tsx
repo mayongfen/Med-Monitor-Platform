@@ -6,7 +6,8 @@ import { FormDialog } from '@/components/ui/form-dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { DictSelect } from '@/components/ui/dict-select'
+import { ADMISSION_TYPE_LABEL, type AdmissionType } from '@/lib/patient-data'
 import { toast } from 'sonner'
 
 export function AdmitDialog({
@@ -72,45 +73,33 @@ export function AdmitDialog({
     >
       <div className="flex flex-col gap-2">
         <Label>患者</Label>
-        <Select value={patientId} onValueChange={setPatientId}>
-          <SelectTrigger><SelectValue placeholder="选择患者" /></SelectTrigger>
-          <SelectContent>
-            {patients.map((p) => (
-              <SelectItem key={p.id} value={p.id}>
-                {p.id} · {p.name} · {p.gender} {p.age}岁
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <DictSelect
+          value={patientId}
+          onValueChange={setPatientId}
+          options={patients.map((p) => ({ value: p.id, label: `${p.id} · ${p.name} · ${p.gender} ${p.age}岁` }))}
+          placeholder="选择患者"
+        />
       </div>
 
       <div className="flex flex-col gap-2">
         <Label>床位（仅显示空闲）</Label>
-        <Select value={bedId} onValueChange={setBedId}>
-          <SelectTrigger><SelectValue placeholder="选择空闲床位" /></SelectTrigger>
-          <SelectContent>
-            {idleBeds.map((b) => (
-              <SelectItem key={b.id} value={b.id}>
-                {b.id} · {b.code}床
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <DictSelect
+          value={bedId}
+          onValueChange={setBedId}
+          options={idleBeds.map((b) => ({ value: b.id, label: `${b.id} · ${b.code}床` }))}
+          placeholder="选择空闲床位"
+        />
         {idleBeds.length === 0 && <p className="text-xs text-destructive">当前无空闲床位</p>}
       </div>
 
       <div className="flex flex-col gap-2">
         <Label>监护设备（可选，仅显示备用）</Label>
-        <Select value={deviceId} onValueChange={setDeviceId}>
-          <SelectTrigger><SelectValue placeholder="不绑定设备" /></SelectTrigger>
-          <SelectContent>
-            {standbyDevices.map((d) => (
-              <SelectItem key={d.id} value={d.id}>
-                {d.code} · {d.model}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <DictSelect
+          value={deviceId}
+          onValueChange={setDeviceId}
+          options={standbyDevices.map((d) => ({ value: d.id, label: `${d.code} · ${d.model}` }))}
+          placeholder="不绑定设备"
+        />
       </div>
 
       <div className="flex flex-col gap-2">
@@ -121,14 +110,11 @@ export function AdmitDialog({
       <div className="grid grid-cols-2 gap-3">
         <div className="flex flex-col gap-2">
           <Label>入院类型</Label>
-          <Select value={type} onValueChange={(v) => setType(v as typeof type)}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="emergency">急诊</SelectItem>
-              <SelectItem value="outpatient">门诊</SelectItem>
-              <SelectItem value="transfer">转院</SelectItem>
-            </SelectContent>
-          </Select>
+          <DictSelect
+            value={type}
+            onValueChange={(v) => setType(v as AdmissionType)}
+            options={(Object.keys(ADMISSION_TYPE_LABEL) as AdmissionType[]).map((t) => ({ value: t, label: ADMISSION_TYPE_LABEL[t] }))}
+          />
         </div>
         <div className="flex flex-col gap-2">
           <Label htmlFor="doc">主治医生</Label>

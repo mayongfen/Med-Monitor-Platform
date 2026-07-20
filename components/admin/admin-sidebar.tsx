@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ChevronDown, HeartPulse } from 'lucide-react'
@@ -9,17 +9,46 @@ import { useAuth } from '@/lib/auth'
 import { canAccess } from '@/lib/permissions'
 import { cn } from '@/lib/utils'
 
+// 跨路由保持侧栏分组展开状态（同一浏览器会话内有效，不做 localStorage 持久化 —— 方案 A）
+// 仅在客户端 effect 中写入，避免 SSR 跨请求污染
+let persistedOpenGroups: Set<string> | null = null
+
+// 计算应自动展开的分组：工作台 + 包含当前路由的组
+function computeAutoOpen(pathname: string): Set<string> {
+  const set = new Set<string>()
+  NAV_GROUPS.forEach((g) => {
+    if (g.label === '工作台' || g.items.some((i) => pathname === i.href || pathname.startsWith(i.href + '/'))) {
+      set.add(g.label)
+    }
+  })
+  return set
+}
+
 export function AdminSidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
   const pathname = usePathname()
   const { role } = useAuth()
-  // 默认展开「包含当前路由的组」+ 工作台；其余收起
-  const initialOpen = new Set<string>()
-  NAV_GROUPS.forEach((g) => {
-    if (g.label === '工作台' || g.items.some((i) => pathname === i.href || pathname.startsWith(i.href + '/'))) {
-      initialOpen.add(g.label)
-    }
-  })
-  const [open, setOpen] = useState<Set<string>>(initialOpen)
+  // 初始展开集 = 已持久化的手动展开 ∪ (当前路由所在组 + 工作台)
+  // 用户手动展开的分组在跨路由后不会丢失，同时保留「当前所在组自动展开」的导航提示
+  const [open, setOpen] = useState<Set<string>>(
+    () => new Set([...(persistedOpenGroups ?? []), ...computeAutoOpen(pathname)]),
+  )
+
+  // 路由变化时自动展开当前所在组（导航提示），但绝不自动收起用户已展开的分组
+  useEffect(() => {
+    setOpen((prev) => {
+      const next = new Set(prev)
+      let changed = false
+      computeAutoOpen(pathname).forEach((g) => {
+        if (!next.has(g)) { next.add(g); changed = true }
+      })
+      return changed ? next : prev
+    })
+  }, [pathname])
+
+  // 持久化到模块级（仅在客户端 effect 写入，SSR 安全无跨请求污染）
+  useEffect(() => {
+    persistedOpenGroups = open
+  }, [open])
 
   function toggle(label: string) {
     setOpen((prev) => {

@@ -4,8 +4,9 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Building2, Check, ChevronsUpDown, LogOut, Moon, Shield, Sun, User } from 'lucide-react'
 import { AlarmBanner } from '@/components/monitor/alarm-banner'
-import { TENANTS, EDITION_LABEL, type Role } from '@/lib/admin-data'
-import { useAuth, ROLE_OPTIONS } from '@/lib/auth'
+import { TENANTS, EDITION_LABEL, USERS, ROLE_CODE_LABEL, type RoleCode } from '@/lib/admin-data'
+import { useAuth, toAuthUser } from '@/lib/auth'
+import { wardName } from '@/lib/ward-data'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,9 +29,14 @@ function toggleTheme() {
   }
 }
 
+function wardScopeLabel(wardIds: string[]): string {
+  if (wardIds.length === 0) return '全部病区'
+  return wardIds.map(wardName).join(' / ')
+}
+
 export function AdminTopbar({ title, onOpenMobile }: { title: string; onOpenMobile?: () => void }) {
   const router = useRouter()
-  const { role, name, setRole, logout } = useAuth()
+  const { user, role, name, wardIds, setUser, logout } = useAuth()
   const [tenant, setTenant] = useState(TENANTS[1])
   const isPlatform = tenant.id === 0
 
@@ -105,7 +111,7 @@ export function AdminTopbar({ title, onOpenMobile }: { title: string; onOpenMobi
           </Badge>
         )}
 
-        {/* 角色切换（演示权限过滤） */}
+        {/* 演示用户切换（携带角色 + 负责病区，联动告警过滤） */}
         <DropdownMenu>
           <DropdownMenuTrigger
             render={
@@ -113,23 +119,44 @@ export function AdminTopbar({ title, onOpenMobile }: { title: string; onOpenMobi
                 <span className="flex size-7 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
                   {name?.[0] ?? '管'}
                 </span>
-                <span className="hidden sm:inline">{name || '未登录'}</span>
+                <span className="hidden flex-col items-start leading-tight sm:flex">
+                  <span className="text-xs font-medium text-foreground">{name || '未登录'}</span>
+                  <span className="text-[10px] text-muted-foreground">
+                    {ROLE_CODE_LABEL[role]} · {wardScopeLabel(wardIds)}
+                  </span>
+                </span>
               </Button>
             }
           />
-          <DropdownMenuContent align="end" className="w-52">
-            <div className="px-2 py-1.5 text-xs text-muted-foreground">切换角色（演示权限）</div>
+          <DropdownMenuContent align="end" className="w-64">
+            <div className="px-2 py-1.5 text-xs text-muted-foreground">切换演示用户（联动角色与病区告警过滤）</div>
             <DropdownMenuSeparator />
-            {ROLE_OPTIONS.map((r) => (
-              <DropdownMenuItem
-                key={r.code}
-                onClick={() => setRole(r.code as Role)}
-                className="flex items-center justify-between"
-              >
-                <span>{r.name}</span>
-                {role === r.code && <Check className="size-3.5 text-primary" />}
-              </DropdownMenuItem>
-            ))}
+            {USERS.map((u) => {
+              const uRole = (u.roles[0] as RoleCode) ?? 'NURSE'
+              const active = u.id === user.id
+              return (
+                <DropdownMenuItem
+                  key={u.id}
+                  onClick={() => setUser(toAuthUser(u.id))}
+                  className="flex items-start justify-between gap-2"
+                >
+                  <span className="flex min-w-0 flex-col">
+                    <span className="flex items-center gap-1.5">
+                      <span className="truncate text-sm font-medium text-foreground">{u.name}</span>
+                      {u.status !== 'active' && (
+                        <Badge variant="secondary" className="text-[9px]">
+                          {u.status === 'locked' ? '锁定' : '禁用'}
+                        </Badge>
+                      )}
+                    </span>
+                    <span className="truncate text-[10px] text-muted-foreground">
+                      {ROLE_CODE_LABEL[uRole]} · {wardScopeLabel(u.wardIds)}
+                    </span>
+                  </span>
+                  {active && <Check className="mt-0.5 size-3.5 shrink-0 text-primary" />}
+                </DropdownMenuItem>
+              )
+            })}
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <User className="size-4" /> 个人中心

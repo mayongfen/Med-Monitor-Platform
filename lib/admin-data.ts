@@ -47,6 +47,24 @@ export type Role = {
   desc: string
 }
 
+// 角色代码（字符串字面量），用于权限判断与告警分发，运行时即 ROLES[].code
+export type RoleCode = 'SUPER_ADMIN' | 'TENANT_ADMIN' | 'DEPT_HEAD' | 'DOCTOR' | 'NURSE' | 'AUDITOR'
+
+export const ROLE_CODE_LABEL: Record<RoleCode, string> = {
+  SUPER_ADMIN: '超级管理员',
+  TENANT_ADMIN: '租户管理员',
+  DEPT_HEAD: '科室主任',
+  DOCTOR: '主治医师',
+  NURSE: '护士',
+  AUDITOR: '审计员',
+}
+
+// 全局视角角色：不受病区范围与规则 notifyRoles 限制，可看到全部告警（运维 / 审计视角）
+export const GLOBAL_ROLES: RoleCode[] = ['SUPER_ADMIN', 'TENANT_ADMIN', 'AUDITOR']
+export function isGlobalRole(code: RoleCode): boolean {
+  return GLOBAL_ROLES.includes(code)
+}
+
 export const ROLES: Role[] = [
   { id: 1, name: '超级管理员', code: 'SUPER_ADMIN', parentId: null, dataScope: 'all', permissions: 999, members: 2, builtin: true, desc: '平台态运维，通配 *:*:*' },
   { id: 2, name: '租户管理员', code: 'TENANT_ADMIN', parentId: 1, dataScope: 'tenant', permissions: 86, members: 4, builtin: true, desc: '租户内全部管理权限' },
@@ -65,6 +83,8 @@ export type User = {
   deptId: number
   roles: string[]
   tenantId: number
+  // 负责病区：非全局角色仅能看到这些病区的患者与告警；空数组表示全局视角
+  wardIds: string[]
   status: 'active' | 'disabled' | 'locked'
   twoFA: boolean
   lastLogin: string
@@ -72,14 +92,14 @@ export type User = {
 }
 
 export const USERS: User[] = [
-  { id: 1, name: '超级管理员', username: 'admin', email: 'admin@platform.io', phone: '138****0001', deptId: 6, roles: ['SUPER_ADMIN'], tenantId: 0, status: 'active', twoFA: true, lastLogin: '2026-07-16 15:42', sessions: 2 },
-  { id: 2, name: '周建国', username: 'zhoujg', email: 'zhoujg@renji.com', phone: '139****2048', deptId: 1, roles: ['TENANT_ADMIN'], tenantId: 101, status: 'active', twoFA: true, lastLogin: '2026-07-16 14:08', sessions: 1 },
-  { id: 3, name: '张主任', username: 'zhangzr', email: 'zhang@renji.com', phone: '137****5521', deptId: 2, roles: ['DEPT_HEAD', 'DOCTOR'], tenantId: 101, status: 'active', twoFA: true, lastLogin: '2026-07-16 13:20', sessions: 3 },
-  { id: 4, name: '李慧', username: 'lihui', email: 'lihui@renji.com', phone: '136****7789', deptId: 4, roles: ['DOCTOR'], tenantId: 101, status: 'active', twoFA: false, lastLogin: '2026-07-16 09:55', sessions: 1 },
-  { id: 5, name: '王芳', username: 'wangfang', email: 'wangf@renji.com', phone: '135****3312', deptId: 4, roles: ['NURSE'], tenantId: 101, status: 'active', twoFA: false, lastLogin: '2026-07-15 22:10', sessions: 1 },
-  { id: 6, name: '陈杰', username: 'chenjie', email: 'chenjie@xiehe.com', phone: '134****8890', deptId: 3, roles: ['DOCTOR'], tenantId: 102, status: 'locked', twoFA: true, lastLogin: '2026-07-10 08:00', sessions: 0 },
-  { id: 7, name: '审计小组', username: 'auditor', email: 'audit@renji.com', phone: '133****0100', deptId: 6, roles: ['AUDITOR'], tenantId: 101, status: 'active', twoFA: true, lastLogin: '2026-07-16 11:30', sessions: 1 },
-  { id: 8, name: '孙浩', username: 'sunhao', email: 'sunhao@xiehe.com', phone: '132****4567', deptId: 3, roles: ['NURSE'], tenantId: 102, status: 'disabled', twoFA: false, lastLogin: '2026-06-28 16:45', sessions: 0 },
+  { id: 1, name: '超级管理员', username: 'admin', email: 'admin@platform.io', phone: '138****0001', deptId: 6, roles: ['SUPER_ADMIN'], tenantId: 0, wardIds: [], status: 'active', twoFA: true, lastLogin: '2026-07-16 15:42', sessions: 2 },
+  { id: 2, name: '周建国', username: 'zhoujg', email: 'zhoujg@renji.com', phone: '139****2048', deptId: 1, roles: ['TENANT_ADMIN'], tenantId: 101, wardIds: [], status: 'active', twoFA: true, lastLogin: '2026-07-16 14:08', sessions: 1 },
+  { id: 3, name: '张主任', username: 'zhangzr', email: 'zhang@renji.com', phone: '137****5521', deptId: 2, roles: ['DEPT_HEAD', 'DOCTOR'], tenantId: 101, wardIds: ['W01', 'W02'], status: 'active', twoFA: true, lastLogin: '2026-07-16 13:20', sessions: 3 },
+  { id: 4, name: '李慧', username: 'lihui', email: 'lihui@renji.com', phone: '136****7789', deptId: 4, roles: ['DOCTOR'], tenantId: 101, wardIds: ['W01'], status: 'active', twoFA: false, lastLogin: '2026-07-16 09:55', sessions: 1 },
+  { id: 5, name: '王芳', username: 'wangfang', email: 'wangf@renji.com', phone: '135****3312', deptId: 4, roles: ['NURSE'], tenantId: 101, wardIds: ['W01'], status: 'active', twoFA: false, lastLogin: '2026-07-15 22:10', sessions: 1 },
+  { id: 6, name: '陈杰', username: 'chenjie', email: 'chenjie@xiehe.com', phone: '134****8890', deptId: 3, roles: ['DOCTOR'], tenantId: 102, wardIds: ['W03'], status: 'locked', twoFA: true, lastLogin: '2026-07-10 08:00', sessions: 0 },
+  { id: 7, name: '审计小组', username: 'auditor', email: 'audit@renji.com', phone: '133****0100', deptId: 6, roles: ['AUDITOR'], tenantId: 101, wardIds: [], status: 'active', twoFA: true, lastLogin: '2026-07-16 11:30', sessions: 1 },
+  { id: 8, name: '孙浩', username: 'sunhao', email: 'sunhao@xiehe.com', phone: '132****4567', deptId: 3, roles: ['NURSE'], tenantId: 102, wardIds: ['W03'], status: 'disabled', twoFA: false, lastLogin: '2026-06-28 16:45', sessions: 0 },
 ]
 
 export type MenuItem = {
@@ -133,6 +153,14 @@ export function deptName(id: number) {
 
 export function tenantName(id: number) {
   return TENANTS.find((t) => t.id === id)?.name ?? '-'
+}
+
+export function findUser(id: number): User | undefined {
+  return USERS.find((u) => u.id === id)
+}
+
+export function findUserByUsername(username: string): User | undefined {
+  return USERS.find((u) => u.username === username)
 }
 
 // ── 权限矩阵（RBAC + ABAC）─────────────────────────────

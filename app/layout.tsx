@@ -1,9 +1,9 @@
-import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Toaster } from '@/components/ui/sonner'
 import { AuthProvider } from '@/lib/auth'
 import { StoreProvider } from '@/lib/store'
 import { GlobalSearch } from '@/components/admin/global-search'
+import { ConditionalShell } from '@/components/admin/conditional-shell'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -32,9 +32,8 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans antialiased">
-        <AuthProvider><StoreProvider><GlobalSearch />{children}</StoreProvider></AuthProvider>
+        <AuthProvider><StoreProvider><GlobalSearch /><ConditionalShell>{children}</ConditionalShell></StoreProvider></AuthProvider>
         <Toaster position="top-right" richColors />
-        {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
   )

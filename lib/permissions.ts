@@ -1,8 +1,8 @@
-import type { Role } from '@/lib/admin-data'
+import type { RoleCode } from '@/lib/admin-data'
 
 // 各菜单所需的最小角色（越往下权限越低）。未列出的视为所有角色可见。
 // 角色层级：SUPER_ADMIN > TENANT_ADMIN > DEPT_HEAD > DOCTOR > NURSE > AUDITOR
-const ROLE_LEVEL: Record<Role, number> = {
+const ROLE_LEVEL: Record<RoleCode, number> = {
   SUPER_ADMIN: 100,
   TENANT_ADMIN: 80,
   DEPT_HEAD: 60,
@@ -28,12 +28,12 @@ const PERMISSIONS: Record<string, number> = {
   '/monitor/rules': ROLE_LEVEL.TENANT_ADMIN,
 }
 
-export function canAccess(href: string, role: Role): boolean {
+export function canAccess(href: string, role: RoleCode): boolean {
   const required = PERMISSIONS[href]
   if (required == null) return true
   return ROLE_LEVEL[role] >= required
 }
 
-export function roleLevel(role: Role): number {
+export function roleLevel(role: RoleCode): number {
   return ROLE_LEVEL[role]
 }

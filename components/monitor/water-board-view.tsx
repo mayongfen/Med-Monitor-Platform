@@ -3,7 +3,8 @@
 import Link from 'next/link'
 import { Tv, AlertTriangle } from 'lucide-react'
 import { useLiveMonitor } from '@/hooks/use-live-monitor'
-import { WARDS, BEDS } from '@/lib/ward-data'
+import { WARDS, BEDS, wardName } from '@/lib/ward-data'
+import { useAuth, isGlobalRole } from '@/lib/auth'
 import { PATIENTS, ADMISSIONS } from '@/lib/patient-data'
 import { cn } from '@/lib/utils'
 import { EcgWaveform } from './ecg-waveform'
@@ -23,6 +24,9 @@ function maskDiag(d: string): string {
 
 export function WaterBoardView() {
   const { vitals, pendingAlarms, history } = useLiveMonitor()
+  const { role, wardIds } = useAuth()
+  const isGlobal = isGlobalRole(role)
+  const scopeLabel = isGlobal ? '全病区视角' : `当前视角：${wardIds.map(wardName).join(' / ')}`
 
   return (
     <div className="space-y-4">
@@ -32,12 +36,12 @@ export function WaterBoardView() {
             <Tv className="size-4 text-primary" /> 电子水牌
           </h2>
           <span className="text-xs text-muted-foreground">
-            实时数据每 2 秒刷新 · 未处理告警 {pendingAlarms.length} 条 · 点击卡片查看详情
+            实时数据每 2 秒刷新 · 未处理告警 {pendingAlarms.length} 条 · {scopeLabel} · 点击卡片查看详情
           </span>
         </div>
 
         <div className="space-y-4">
-          {WARDS.filter((w) => w.status === 'open').map((w) => {
+          {WARDS.filter((w) => w.status === 'open' && (isGlobal || wardIds.includes(w.id))).map((w) => {
             const beds = BEDS.filter((b) => b.wardId === w.id)
             const occupied = beds.filter((b) => b.status === 'occupied')
             return (

@@ -2,7 +2,7 @@
 
 import { useRef } from 'react'
 import { Printer } from 'lucide-react'
-import { patientName, OUTCOME_LABEL } from '@/lib/patient-data'
+import { CONTACT_RELATION_LABEL } from '@/lib/patient-data'
 import { wardName, BED_TYPE_LABEL } from '@/lib/ward-data'
 import { useStore } from '@/lib/store'
 import { FormDialog } from '@/components/ui/form-dialog'
@@ -18,10 +18,10 @@ export function BedCardDialog({
   bedId: string | null
 }) {
   const { beds, patients } = useStore()
+  const ref = useRef<HTMLDivElement>(null)
   const bed = beds.find((b) => b.id === bedId)
   if (!bed) return null
   const patient = bed.patientId ? patients.find((p) => p.id === bed.patientId) : undefined
-  const ref = useRef<HTMLDivElement>(null)
 
   function print() {
     window.print()
@@ -51,8 +51,16 @@ export function BedCardDialog({
           <Row label="年龄" value={patient ? `${patient.age}岁` : '—'} />
           <Row label="身份证" value={patient?.idCard ?? '—'} />
           <Row label="过敏史" value={patient?.allergy ?? '无'} />
-          <Row label="紧急联系" value={patient?.contact ?? '—'} />
-          <Row label="电话" value={patient?.phone ?? '—'} />
+          {patient?.contacts?.length ? (
+            patient.contacts.map((c, i) => {
+              const rel = c.relation ? CONTACT_RELATION_LABEL[c.relation] : '联系人'
+              return (
+                <Row key={i} label={`紧急联系${patient.contacts.length > 1 ? i + 1 : ''}`} value={`${c.name}（${rel}）${c.phone}`} />
+              )
+            })
+          ) : (
+            <Row label="紧急联系" value="—" />
+          )}
         </div>
       </div>
     </FormDialog>

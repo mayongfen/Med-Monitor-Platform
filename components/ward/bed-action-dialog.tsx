@@ -5,9 +5,9 @@ import { useStore } from '@/lib/store'
 import { FormDialog } from '@/components/ui/form-dialog'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { DictSelect, dictOptions } from '@/components/ui/dict-select'
 import { toast } from 'sonner'
-import type { BedStatus } from '@/lib/ward-data'
+import { BED_STATUS_LABEL, type BedStatus } from '@/lib/ward-data'
 
 export function BedActionDialog({
   open,
@@ -74,40 +74,32 @@ export function BedActionDialog({
         <>
           <div className="flex flex-col gap-2">
             <Label>患者（仅显示未占用床位者）</Label>
-            <Select value={patientId} onValueChange={setPatientId}>
-              <SelectTrigger><SelectValue placeholder="选择患者" /></SelectTrigger>
-              <SelectContent>
-                {idlePatients.map((p) => (
-                  <SelectItem key={p.id} value={p.id}>{p.id} · {p.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <DictSelect
+              value={patientId}
+              onValueChange={setPatientId}
+              options={idlePatients.map((p) => ({ value: p.id, label: `${p.id} · ${p.name}` }))}
+              placeholder="选择患者"
+            />
           </div>
           <div className="flex flex-col gap-2">
             <Label>监护设备（可选）</Label>
-            <Select value={deviceId} onValueChange={setDeviceId}>
-              <SelectTrigger><SelectValue placeholder="不绑定" /></SelectTrigger>
-              <SelectContent>
-                {standbyDevices.map((d) => (
-                  <SelectItem key={d.id} value={d.id}>{d.code} · {d.model}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <DictSelect
+              value={deviceId}
+              onValueChange={setDeviceId}
+              options={standbyDevices.map((d) => ({ value: d.id, label: `${d.code} · ${d.model}` }))}
+              placeholder="不绑定"
+            />
           </div>
         </>
       )}
       {mode === 'status' && (
         <div className="flex flex-col gap-2">
           <Label>新状态</Label>
-          <Select value={status} onValueChange={(v) => setStatus(v as BedStatus)}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="idle">空闲</SelectItem>
-              <SelectItem value="disinfect">消毒</SelectItem>
-              <SelectItem value="maintenance">维修</SelectItem>
-              <SelectItem value="reserved">预占</SelectItem>
-            </SelectContent>
-          </Select>
+          <DictSelect
+            value={status}
+            onValueChange={(v) => setStatus(v as BedStatus)}
+            options={dictOptions(BED_STATUS_LABEL)}
+          />
         </div>
       )}
       {mode === 'unbind' && (

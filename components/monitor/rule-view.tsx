@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { SlidersHorizontal, Plus, Pencil, Trash2 } from 'lucide-react'
 import { useStore } from '@/lib/store'
 import { OP_LABEL, RULE_TYPE_LABEL, ruleStats, type AlarmRule } from '@/lib/alarm-rule-data'
+import { ROLE_CODE_LABEL, type RoleCode } from '@/lib/admin-data'
 import { ALARM_LEVEL_META } from '@/lib/alarm-data'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
@@ -63,6 +64,7 @@ export function RuleView() {
                 <th className="px-3 py-2 font-medium">类型</th>
                 <th className="px-3 py-2 font-medium">触发条件</th>
                 <th className="px-3 py-2 font-medium">级别</th>
+                <th className="px-3 py-2 font-medium">通知角色</th>
                 <th className="px-3 py-2 font-medium">启用</th>
                 <th className="px-3 py-2 font-medium">备注</th>
                 <th className="px-3 py-2 font-medium">操作</th>
@@ -86,6 +88,19 @@ export function RuleView() {
                         <span className={cn('size-1.5 rounded-full', meta.dot, r.level === 'critical' && 'animate-pulse')} />
                         {meta.label}
                       </span>
+                    </td>
+                    <td className="px-3 py-2.5">
+                      {r.notifyRoles && r.notifyRoles.length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {r.notifyRoles.map((rc) => (
+                            <span key={rc} className="rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
+                              {ROLE_CODE_LABEL[rc as RoleCode]}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">全部角色</span>
+                      )}
                     </td>
                     <td className="px-3 py-2.5">
                       <Switch checked={r.enabled} onCheckedChange={() => toggleRule(r.id)} />

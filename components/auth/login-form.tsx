@@ -18,7 +18,7 @@ import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Separator } from '@/components/ui/separator'
 import { GitHubIcon, GoogleIcon, QQIcon } from './oauth-icons'
-import { useAuth } from '@/lib/auth'
+import { useAuth, toAuthUserByUsername } from '@/lib/auth'
 import { cn } from '@/lib/utils'
 
 type TwoFAMethod = 'totp' | 'email' | 'sms'
@@ -103,7 +103,7 @@ export function LoginForm() {
     setLoading(true)
     setTimeout(() => {
       setLoading(false)
-      login('SUPER_ADMIN', '超级管理员')
+      login(toAuthUserByUsername(username))
       const redirect = new URLSearchParams(window.location.search).get('redirect') || '/'
       router.push(redirect)
     }, 900)

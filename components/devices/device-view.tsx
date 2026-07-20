@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, HardDrive, Download } from 'lucide-react'
+import { Plus, HardDrive, Download, Upload } from 'lucide-react'
 import { useStore } from '@/lib/store'
 import { wardName } from '@/lib/ward-data'
 import { depreciation, DEVICE_STATUS_LABEL, DEVICE_STATUS_META, type DeviceStatus } from '@/lib/device-data'
