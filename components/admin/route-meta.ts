@@ -1,3 +1,5 @@
+import { normalizePathname } from '@/lib/utils'
+
 // 控制台路由 → 顶栏标题映射
 // 外壳上提到根 layout 后，顶栏标题由当前路由推导（不再由各 page 传入）
 export const ROUTE_TITLES: Record<string, string> = {
@@ -26,5 +28,5 @@ export const ROUTE_TITLES: Record<string, string> = {
 }
 
 export function routeTitle(pathname: string): string {
-  return ROUTE_TITLES[pathname] ?? '控制台'
+  return ROUTE_TITLES[normalizePathname(pathname)] ?? '控制台'
 }

@@ -7,7 +7,7 @@ import { ChevronDown, HeartPulse } from 'lucide-react'
 import { NAV_GROUPS } from './nav-config'
 import { useAuth } from '@/lib/auth'
 import { canAccess } from '@/lib/permissions'
-import { cn } from '@/lib/utils'
+import { cn, normalizePathname } from '@/lib/utils'
 
 // 跨路由保持侧栏分组展开状态（同一浏览器会话内有效，不做 localStorage 持久化 —— 方案 A）
 // 仅在客户端 effect 中写入，避免 SSR 跨请求污染
@@ -85,7 +85,8 @@ export function AdminSidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
               {isOpen && (
                 <ul className="mb-2 mt-0.5 flex flex-col gap-0.5">
                   {items.map((item) => {
-                    const active = pathname === item.href
+                    // trailingSlash:true 时 pathname 带尾斜杠（/admin/users/），需与 item.href 归一化后比较
+                    const active = normalizePathname(pathname) === normalizePathname(item.href)
                     return (
                       <li key={item.href}>
                         <Link
