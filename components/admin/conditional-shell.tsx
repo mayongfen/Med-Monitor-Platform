@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation'
 import { type ReactNode } from 'react'
 import { ConsoleShell } from './console-shell'
+import { normalizePathname } from '@/lib/utils'
 
 // 独立全屏页面（不套控制台外壳）：登录页 + 实时监护大屏
 const STANDALONE_ROUTES = new Set(['/login', '/dashboard'])
@@ -14,6 +15,8 @@ const STANDALONE_ROUTES = new Set(['/login', '/dashboard'])
  */
 export function ConditionalShell({ children }: { children: ReactNode }) {
   const pathname = usePathname()
-  if (STANDALONE_ROUTES.has(pathname)) return <>{children}</>
+  // trailingSlash:true 时 pathname 带尾斜杠（/login/），需归一化后再比较，
+  // 否则登录页/大屏会被误套控制台外壳
+  if (STANDALONE_ROUTES.has(normalizePathname(pathname))) return <>{children}</>
   return <ConsoleShell>{children}</ConsoleShell>
 }

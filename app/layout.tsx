@@ -4,6 +4,7 @@ import { AuthProvider } from '@/lib/auth'
 import { StoreProvider } from '@/lib/store'
 import { GlobalSearch } from '@/components/admin/global-search'
 import { ConditionalShell } from '@/components/admin/conditional-shell'
+import { AuthGuard } from '@/components/admin/auth-guard'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -32,7 +33,7 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans antialiased">
-        <AuthProvider><StoreProvider><GlobalSearch /><ConditionalShell>{children}</ConditionalShell></StoreProvider></AuthProvider>
+        <AuthProvider><StoreProvider><GlobalSearch /><AuthGuard><ConditionalShell>{children}</ConditionalShell></AuthGuard></StoreProvider></AuthProvider>
         <Toaster position="top-right" richColors />
       </body>
     </html>
