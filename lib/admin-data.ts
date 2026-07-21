@@ -12,8 +12,8 @@ export type Tenant = {
 
 export const TENANTS: Tenant[] = [
   { id: 0, name: '平台（全局）', code: 'PLATFORM', edition: 'enterprise', status: 'active', userCount: 6, createdAt: '2025-01-01' },
-  { id: 101, name: '仁济医院', code: 'RENJI', edition: 'enterprise', status: 'active', userCount: 128, createdAt: '2025-03-12' },
-  { id: 102, name: '协和门诊部', code: 'XIEHE', edition: 'pro', status: 'active', userCount: 47, createdAt: '2025-06-08' },
+  { id: 101, name: '某某医院', code: 'HOSP01', edition: 'enterprise', status: 'active', userCount: 128, createdAt: '2025-03-12' },
+  { id: 102, name: '某某门诊部', code: 'CLINIC01', edition: 'pro', status: 'active', userCount: 47, createdAt: '2025-06-08' },
   { id: 103, name: '社区康复中心', code: 'COMM', edition: 'free', status: 'suspended', userCount: 12, createdAt: '2025-09-21' },
 ]
 
@@ -27,7 +27,7 @@ export type Dept = {
 }
 
 export const DEPTS: Dept[] = [
-  { id: 1, name: '仁济医院', parentId: null, leader: '院长办公室', scope: 'tenant', order: 1 },
+  { id: 1, name: '某某医院', parentId: null, leader: '院长办公室', scope: 'tenant', order: 1 },
   { id: 2, name: '重症医学科 (ICU)', parentId: 1, leader: '张主任', scope: 'dept', order: 1 },
   { id: 3, name: '心血管内科 (CCU)', parentId: 1, leader: '李主任', scope: 'dept', order: 2 },
   { id: 4, name: 'ICU-A 病区', parentId: 2, leader: '王护士长', scope: 'dept', order: 1 },
@@ -214,9 +214,9 @@ export type ApprovalRequest = {
 export const APPROVALS: ApprovalRequest[] = [
   { id: 'REQ-20260716-01', type: 'grant', applicant: '李慧（主治医师）', target: 'user:reset:tenant', reason: '夜班需为新入职护士重置初始密码', scope: 'ICU-A 病区', status: 'pending', createdAt: '2026-07-16 20:14', approver: '张主任' },
   { id: 'REQ-20260716-02', type: 'delegate', applicant: '张主任（科室主任）', target: '王芳（护士）', reason: '外出学术会议 3 天，临时委托病区管理', scope: '重症医学科', status: 'pending', createdAt: '2026-07-16 18:02', approver: '周建国', expireAt: '2026-07-20 09:00' },
-  { id: 'REQ-20260715-08', type: 'grant', applicant: '孙浩（护士）', target: 'audit:list:tenant', reason: '协助质控科整理月度监护记录', scope: '协和门诊部', status: 'approved', createdAt: '2026-07-15 10:30', approver: '周建国' },
-  { id: 'REQ-20260714-03', type: 'grant', applicant: '陈杰（主治医师）', target: 'audit:export:tenant', reason: '导出季度审计报表用于外部审计', scope: '协和门诊部', status: 'rejected', createdAt: '2026-07-14 15:48', approver: '超级管理员' },
-  { id: 'REQ-20260713-05', type: 'delegate', applicant: '周建国（租户管理员）', target: '审计小组', reason: '年假期间委托日常用户审批', scope: '仁济医院', status: 'approved', createdAt: '2026-07-13 09:12', approver: '超级管理员', expireAt: '2026-07-27 09:00' },
+  { id: 'REQ-20260715-08', type: 'grant', applicant: '孙浩（护士）', target: 'audit:list:tenant', reason: '协助质控科整理月度监护记录', scope: '某某门诊部', status: 'approved', createdAt: '2026-07-15 10:30', approver: '周建国' },
+  { id: 'REQ-20260714-03', type: 'grant', applicant: '陈杰（主治医师）', target: 'audit:export:tenant', reason: '导出季度审计报表用于外部审计', scope: '某某门诊部', status: 'rejected', createdAt: '2026-07-14 15:48', approver: '超级管理员' },
+  { id: 'REQ-20260713-05', type: 'delegate', applicant: '周建国（租户管理员）', target: '审计小组', reason: '年假期间委托日常用户审批', scope: '某某医院', status: 'approved', createdAt: '2026-07-13 09:12', approver: '超级管理员', expireAt: '2026-07-27 09:00' },
 ]
 
 export const APPROVAL_STATUS_LABEL: Record<ApprovalRequest['status'], string> = {

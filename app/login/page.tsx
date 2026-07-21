@@ -17,7 +17,7 @@ export default function LoginPage() {
           <div className="flex size-9 items-center justify-center rounded-lg bg-primary-foreground/15">
             <HeartPulse className="size-5" />
           </div>
-          <span className="text-lg font-semibold">智联医护</span>
+          <span className="text-lg font-semibold">某某医护平台</span>
         </Link>
 
         <div className="max-w-md">
@@ -43,7 +43,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <p className="text-xs text-primary-foreground/60">© 2026 智联医护 · 仅供演示的前端原型</p>
+        <p className="text-xs text-primary-foreground/60">© 2026 某某医护平台 · 仅供演示的前端原型</p>
       </section>
 
       {/* 表单侧 */}
@@ -53,7 +53,7 @@ export default function LoginPage() {
             <div className="mx-auto mb-3 flex size-11 items-center justify-center rounded-xl bg-primary text-primary-foreground">
               <HeartPulse className="size-6" />
             </div>
-            <h1 className="text-xl font-semibold text-foreground">智联医护</h1>
+            <h1 className="text-xl font-semibold text-foreground">某某医护平台</h1>
           </div>
           <div className="mb-6">
             <h2 className="text-xl font-semibold text-foreground">欢迎回来</h2>

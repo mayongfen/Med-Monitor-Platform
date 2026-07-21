@@ -8,7 +8,7 @@ import { AuthGuard } from '@/components/admin/auth-guard'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: '智联医护 · 非接触式智能监护系统',
+  title: '某某医护平台 · 非接触式智能监护系统',
   description: '机构版非接触式智能监护系统：实时监护、告警管理、住院全流程、设备与权限治理',
   generator: 'v0.app',
 }

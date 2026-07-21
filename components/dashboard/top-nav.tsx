@@ -33,7 +33,7 @@ export function TopNav({ alarms }: { alarms: Alarm[] }) {
           <HeartPulse className="size-5" />
         </div>
         <div className="leading-tight">
-          <p className="text-sm font-semibold text-foreground">智联医护 · 实时监护中心</p>
+          <p className="text-sm font-semibold text-foreground">某某医护平台 · 实时监护中心</p>
           <p className="text-xs text-muted-foreground">ICU / CCU 多床位床旁监测</p>
         </div>
       </div>

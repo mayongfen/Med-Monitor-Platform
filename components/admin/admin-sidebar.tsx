@@ -65,7 +65,7 @@ export function AdminSidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
         <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
           <HeartPulse className="size-4" />
         </div>
-        <span className="text-sm font-semibold text-sidebar-foreground">智联医护 · 控制台</span>
+        <span className="text-sm font-semibold text-sidebar-foreground">某某医护平台 · 控制台</span>
       </Link>
 
       <nav className="sidebar-scroll flex-1 overflow-y-auto px-3 py-3">
